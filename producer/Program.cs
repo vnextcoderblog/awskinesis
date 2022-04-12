@@ -20,9 +20,12 @@ ServicePointManager.DefaultConnectionLimit = int.Parse(config["ParallelServiceCo
 var maxThreads = int.Parse(config["MaxThreads"]);
 var customersCount = int.Parse(config["CustomersCount"]);
 
-int CustomerId = 4000;
+var CustomerIdSeed = int.Parse(config["CustomersIdSeed"]);
+
+
+
 var customerFaker = new Faker<Customer>()
-    .CustomInstantiator(f => new Customer(CustomerId++))
+    .CustomInstantiator(f => new Customer(CustomerIdSeed++))
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName());
 
