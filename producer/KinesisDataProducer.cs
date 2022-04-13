@@ -27,6 +27,11 @@ internal class KinesisDataProducer : IProducer
             MaxDegreeOfParallelism = ParallelConnections
         };
     }
+    public void Connect()
+    {
+        Console.WriteLine("Initializing FireHose Connectivity using Implicit Credentials!");
+        _client = new AmazonKinesisClient(_regionEndpoint);
+    }
 
     public void Connect(string AccessKey, string AccessSecret)
     {

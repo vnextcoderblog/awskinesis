@@ -20,7 +20,7 @@ namespace producer
             else
                 _regionEndpoint = RegionEndpoint.USEast1;
 
-            options= new ParallelOptions()
+            options = new ParallelOptions()
             {
                 MaxDegreeOfParallelism = ParallelConnections
             };
@@ -34,6 +34,14 @@ namespace producer
 
             var cred = new BasicAWSCredentials(AccessKey, AccessSecret);
             _client = new AmazonKinesisFirehoseClient(cred, _regionEndpoint);
+        }
+
+        public void Connect()
+        {
+            Console.WriteLine("Initializing FireHose Connectivity using Implicit Credentials!");
+
+
+            _client = new AmazonKinesisFirehoseClient(_regionEndpoint);
         }
 
         public async Task SendAsync(List<Customer> customers)

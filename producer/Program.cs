@@ -29,20 +29,32 @@ var customerFaker = new Faker<Customer>()
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName());
 
-var kinesisConfiguration = config.GetSection("Kinesis").Get<KinesisConfiguration>();
-var firehoseConfiguration = config.GetSection("KinesisFirehose").Get<KinesisFirehoseConfiguration>();
+var kinesisConfiguration = config.GetSection("KinesisConfiguration").Get<KinesisConfiguration>();
 
 IProducer producer = null;
 
 if (config["Mode"] == "Kinesis")
 {
     producer = new KinesisDataProducer(kinesisConfiguration.Stream, RegionEndpoint.USEast1, maxThreads);
-    producer.Connect(kinesisConfiguration.AccessKey, kinesisConfiguration.AccessSecret);
+}
+else if (config["Mode"] == "FireHose")
+{
+    producer = new FirehoseDataProducer(kinesisConfiguration.Stream, RegionEndpoint.USEast1, maxThreads);
 }
 else
 {
-    producer = new FirehoseDataProducer(firehoseConfiguration.Stream, RegionEndpoint.USEast1, maxThreads);
-    producer.Connect(firehoseConfiguration.AccessKey, firehoseConfiguration.AccessSecret);
+    Console.WriteLine("Enter Mode as either Kinesis or FireHose in the appSettings");
+    return;
+}
+
+if (kinesisConfiguration.UseAWSProfile)
+    producer.Connect();
+else if (! string.IsNullOrEmpty(kinesisConfiguration.AccessKey) && ! string.IsNullOrEmpty(kinesisConfiguration.AccessSecret))
+    producer.Connect(kinesisConfiguration.AccessKey, kinesisConfiguration.AccessSecret);
+else
+{
+    Console.WriteLine("Invalid Credentials.  Either specify AccessKey and AccessSecret   OR Specify UseAWSProfile as 'true' to use AWS Profile Credentials");
+    return;
 }
 var more = "";
 do
